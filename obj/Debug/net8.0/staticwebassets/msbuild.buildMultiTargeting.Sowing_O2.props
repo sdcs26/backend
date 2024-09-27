@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\Sowing_O2.props" />
+</Project>

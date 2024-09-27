@@ -1,8 +1,8 @@
-namespace WebApplication2
+namespace Sowing_O2
 {
     public class WeatherForecast
     {
-        public DateTime Date { get; set; }
+        public DateOnly Date { get; set; }
 
         public int TemperatureC { get; set; }
 
