@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "HB3sdedo3AKy8qm61MVA7gIFSNhQihwNMhAd086I0ZIU9hwFzoDwbhzFdDOdnt8VJTlroLhDMBLPFXfWJvs0Pw==",
+  "dgSpecHash": "CUgbOHzXU4TjtGiYDwe75yvSLhpyzybPMal/x+uQyF/rr44+b33LOuCb5Q8jJHpK9zZcniSvJQeTg4huAtOlLQ==",
   "success": true,
   "projectFilePath": "C:\\Users\\ivany\\source\\repos\\Sowing_O2\\Sowing_O2\\Sowing_O2.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\ivany\\.nuget\\packages\\azure.core\\1.35.0\\azure.core.1.35.0.nupkg.sha512",
     "C:\\Users\\ivany\\.nuget\\packages\\azure.identity\\1.10.3\\azure.identity.1.10.3.nupkg.sha512",
+    "C:\\Users\\ivany\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",
     "C:\\Users\\ivany\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\ivany\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\6.0.0\\microsoft.bcl.asyncinterfaces.6.0.0.nupkg.sha512",
     "C:\\Users\\ivany\\.nuget\\packages\\microsoft.codeanalysis.analyzers\\3.3.3\\microsoft.codeanalysis.analyzers.3.3.3.nupkg.sha512",

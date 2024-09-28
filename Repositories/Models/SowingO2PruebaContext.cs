@@ -14,7 +14,7 @@ public partial class SowingO2PruebaContext : DbContext
         : base(options)
     {
     }
-
+        
     public virtual DbSet<Auditorium> Auditoria { get; set; }
 
     public virtual DbSet<Categorium> Categoria { get; set; }
