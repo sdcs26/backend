@@ -3,6 +3,9 @@ using Sowing_O2.Repositories.Models;
 using Sowing_O2.Services;
 using Sowing_O2.Repositories;
 using static Sowing_O2.Utilities.Encriptacion;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +23,27 @@ builder.Services.AddDbContext<SowingO2PruebaContext>(options =>
 // Registrar UsuarioRepositories y UsuarioService
 builder.Services.AddScoped<UsuarioRepositories>();
 builder.Services.AddScoped<UsuarioService>();
+builder.Services.AddScoped<ITokenRevocadoService, TokenRevocadoService>();
+builder.Services.AddScoped<TokenRevocadoRepositories>();
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = "https://Sowing_O2.com",
+        ValidAudience = "https://Sowing_O2.com",
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("Gabi@Ivan@Sergi@45Software601@24"))
+    };
+});
 
 var app = builder.Build();
 
@@ -38,3 +62,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+

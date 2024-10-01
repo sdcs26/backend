@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Sowing_O2.Dtos;
 
 namespace Sowing_O2.Repositories.Models;
 
@@ -32,6 +33,7 @@ public partial class SowingO2PruebaContext : DbContext
     public virtual DbSet<Ubicacion> Ubicacions { get; set; }
 
     public virtual DbSet<Usuario> Usuarios { get; set; }
+    public DbSet<TokenRevocado> TokenRevocado { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseSqlServer("Name=DefaultConnection");

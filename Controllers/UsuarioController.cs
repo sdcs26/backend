@@ -40,8 +40,8 @@ namespace Sowing_O2.Controllers
         {
             try
             {
-                var usuario = _usuarioService.Login(loginDto);
-                return Ok(new { mensaje = "Inicio de sesión exitoso", usuario });
+                var token = _usuarioService.Login(loginDto);
+                return Ok(new { mensaje = "Inicio de sesión exitoso", token });
             }
             catch (Exception ex)
             {

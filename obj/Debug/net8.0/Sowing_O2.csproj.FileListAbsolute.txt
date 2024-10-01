@@ -137,3 +137,5 @@ C:\Users\ivany\source\repos\Sowing_O2\Sowing_O2\obj\Debug\net8.0\Sowing_O2.pdb
 C:\Users\ivany\source\repos\Sowing_O2\Sowing_O2\obj\Debug\net8.0\Sowing_O2.genruntimeconfig.cache
 C:\Users\ivany\source\repos\Sowing_O2\Sowing_O2\obj\Debug\net8.0\ref\Sowing_O2.dll
 C:\Users\ivany\source\repos\Sowing_O2\Sowing_O2\bin\Debug\net8.0\BCrypt.Net-Next.dll
+C:\Users\ivany\source\repos\Sowing_O2\Sowing_O2\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\ivany\source\repos\Sowing_O2\Sowing_O2\bin\Debug\net8.0\Microsoft.Bcl.TimeProvider.dll

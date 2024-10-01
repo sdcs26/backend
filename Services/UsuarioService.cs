@@ -3,6 +3,11 @@ using Sowing_O2.Repositories.Models;
 using Sowing_O2.Repositories;
 using static Sowing_O2.Utilities.Encriptacion;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using Sowing_O2.Utilities;
 
 namespace Sowing_O2.Services
 {
@@ -56,7 +61,7 @@ namespace Sowing_O2.Services
             }
         }
 
-        public Usuario Login(LoginDto loginDto)
+        public LoginResponseDto Login(LoginDto loginDto)
         {
             var usuario = _usuarioRepository.GetUsuarioPorCorreo(loginDto.Correo);
 
@@ -64,8 +69,32 @@ namespace Sowing_O2.Services
             {
                 throw new Exception("Credenciales inválidas.");
             }
-            return usuario; // Retorna el usuario autenticado
+
+            // Generar token JWT
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes("Gabi@Ivan@Sergi@45Software601@24"); // Clave secreta de firma
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+            new Claim(ClaimTypes.Name, usuario.Nombre),
+            new Claim(ClaimTypes.Email, usuario.Correo)
+                }),
+                Expires = DateTime.UtcNow.AddHours(1),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var tokenString = tokenHandler.WriteToken(token);
+
+            // Retornar el objeto de respuesta que contiene el usuario y el token
+            return new LoginResponseDto
+            {
+                Nombre = usuario.Nombre,
+                Correo = usuario.Correo,
+                Token = tokenString
+            };
         }
+
 
         public List<UsuarioDto> ObtenerUsuarios()
         {
