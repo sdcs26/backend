@@ -1,31 +1,44 @@
 ﻿using Sowing_O2.Dtos;
 using Sowing_O2.Repositories;
+using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 
 namespace Sowing_O2.Services
 {
-    public interface ITokenRevocadoService
+    public class TokenRevocadoService
     {
-        bool IsTokenRevoked(string token);
-        void AddRevokedToken(TokenRevocadoDto tokenRevocadoDto);
-    }
+        private readonly TokenRevocadoRepositories _tokenRepository;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public class TokenRevocadoService : ITokenRevocadoService
-    {
-        private readonly TokenRevocadoRepositories _tokenRevocadoRepository;
-
-        public TokenRevocadoService(TokenRevocadoRepositories tokenRevocadoRepository)
+        public TokenRevocadoService(TokenRevocadoRepositories tokenRepository, IHttpContextAccessor httpContextAccessor)
         {
-            _tokenRevocadoRepository = tokenRevocadoRepository;
+            _tokenRepository = tokenRepository;
+            _httpContextAccessor = httpContextAccessor;
         }
 
-        public bool IsTokenRevoked(string token)
+        public void Logout(string token)
         {
-            return _tokenRevocadoRepository.IsTokenRevoked(token);
+            _tokenRepository.AddTokenRevocado(token);
         }
 
-        public void AddRevokedToken(TokenRevocadoDto tokenRevocadoDto)
+        public bool IsTokenValid(string token)
         {
-            _tokenRevocadoRepository.AddTokenRevocado(tokenRevocadoDto);
+            return !_tokenRepository.IsTokenRevoked(token);
+        }
+
+        public async Task InvokeAsync(HttpContext context)
+        {
+            string token = context.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            if (IsTokenValid(token))
+            {
+                await context.Response.WriteAsync("El token es válido.");
+            }
+            else
+            {
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                await context.Response.WriteAsync("El token ha sido revocado.");
+            }
         }
     }
 }
+

@@ -6,49 +6,64 @@ using static Sowing_O2.Utilities.Encriptacion;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Sowing_O2.Dtos;
+using Sowing_O2.Utilities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddScoped<ISecurityService, SecurityService>();
 
-
-// Registrar el contexto de la base de datos
 builder.Services.AddDbContext<SowingO2PruebaContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Registrar UsuarioRepositories y UsuarioService
+
 builder.Services.AddScoped<UsuarioRepositories>();
 builder.Services.AddScoped<UsuarioService>();
-builder.Services.AddScoped<ITokenRevocadoService, TokenRevocadoService>();
+builder.Services.AddScoped<TokenRevocadoService>();
 builder.Services.AddScoped<TokenRevocadoRepositories>();
+builder.Services.AddScoped<IEmailSender, EmailSender>();
+builder.Services.AddScoped<RecuperacionTokenRepository>();
+builder.Services.AddScoped<RecuperarContrasenaService>();
+
+
+
+var bindJwtSettings = new JwtSettingsDto();
+builder.Configuration.Bind("JsonWebTokenKeys", bindJwtSettings);
+builder.Services.AddSingleton(bindJwtSettings);
 
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
+}).AddJwtBearer(options =>
 {
-    options.TokenValidationParameters = new TokenValidationParameters
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters()
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = "https://Sowing_O2.com",
-        ValidAudience = "https://Sowing_O2.com",
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("Gabi@Ivan@Sergi@45Software601@24"))
+        ValidateIssuerSigningKey = bindJwtSettings.ValidateIssuerSigningKey,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(bindJwtSettings.IssuerSigningKey)),
+        ValidateIssuer = bindJwtSettings.ValidateIssuer,
+        ValidIssuer = bindJwtSettings.ValidIssuer,
+        ValidateAudience = bindJwtSettings.ValidateAudience,
+        ValidAudience = bindJwtSettings.ValidAudience,
+        RequireExpirationTime = bindJwtSettings.RequireExpirationTime,
+        ValidateLifetime = bindJwtSettings.ValidateLifetime,
+        ClockSkew = TimeSpan.Zero
     };
 });
 
 var app = builder.Build();
 
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

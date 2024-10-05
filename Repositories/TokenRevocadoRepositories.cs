@@ -12,17 +12,17 @@ namespace Sowing_O2.Repositories
             _context = context;
         }
 
-        public void AddTokenRevocado(TokenRevocadoDto tokenRevocadoDto)
+        public void AddTokenRevocado(string token)
         {
-            var tokenRevocado = new TokenRevocado
+            var revokedToken = new TokenRevocado
             {
-                Token = tokenRevocadoDto.Token,
+                Token = token,
                 fechaRevocado = DateTime.UtcNow
             };
-
-            _context.TokenRevocado.Add(tokenRevocado);
+            _context.TokenRevocado.Add(revokedToken);
             _context.SaveChanges();
         }
+
         public bool IsTokenRevoked(string token)
         {
             return _context.TokenRevocado.Any(rt => rt.Token == token);

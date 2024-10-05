@@ -2,6 +2,8 @@
 using Sowing_O2.Services;
 using Sowing_O2.Dtos;
 using Sowing_O2.Controllers;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
 
 namespace Sowing_O2.Repositories
 {
@@ -24,14 +26,38 @@ namespace Sowing_O2.Repositories
         {
             return _context.Usuarios.ToList();
         }
-        public Usuario GetUsuarioPorCorreo(string correo)
+        public async Task<UsuarioDto> GetUsuarioPorCorreo(string correo)
         {
-            return _context.Usuarios.FirstOrDefault(u => u.Correo == correo);
-        }
+            var user = await _context.Usuarios.FirstOrDefaultAsync(u => u.Correo.Equals(correo));
 
+            if (user == null) return null;
+
+            return new UsuarioDto
+            {
+                NumDocumento = user.NumDocumento,
+                Nombre = user.Nombre,
+                Apellido = user.Apellido,
+                Correo = user.Correo,
+                Contrasena = user.Contrasena,
+                IdRol = user.IdRol
+            };
+        }
         public Usuario GetUsuarioPorNumeroDocumento(int numDocumento)
         {
             return _context.Usuarios.FirstOrDefault(u => u.NumDocumento == numDocumento);
+        }
+        public async Task UpdateUsuario(Usuario usuario)
+        {
+            _context.Usuarios.Update(usuario);
+            await _context.SaveChangesAsync();
+        }
+        public async Task EliminarRegistrosDuplicadosPorCorreoAsync(string correo)
+        {
+            await _context.Database.ExecuteSqlRawAsync("EXEC EliminarUsuariosDuplicadosPorCorreo @Correo", new SqlParameter("@Correo", correo));
+        }
+        public async Task<Usuario> GetUsuarioPorCorreoModelo(string correo)
+        {
+            return await _context.Usuarios.FirstOrDefaultAsync(u => u.Correo.Equals(correo));
         }
 
     }
