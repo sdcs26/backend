@@ -9,7 +9,7 @@ namespace WebApplication2.Controllers
     {
         [HttpGet]
         [Route("listar")]
-        public dynamic listarcliente()
+        public dynamic listarsemilla()
         {
             List<semilla> semilla = new List<semilla>
             {
@@ -20,6 +20,7 @@ namespace WebApplication2.Controllers
                    cantidad="10000",
                     
                 }
+
 
                 /* new cliente
 
@@ -34,16 +35,10 @@ namespace WebApplication2.Controllers
             };
 
             return semilla;
-
-
-
             //}
             //[HttpPost]
             //[Route("guardar")]
             //public dynamic guardarcliente()
-
-
-
             //}
         }
     }
