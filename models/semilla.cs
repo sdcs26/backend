@@ -1,9 +1,13 @@
 ﻿namespace WebApplication2.models
 {
-    public class semilla
+    public class Semilla
     {
-        public string nombre { get; set; }
-        public string id { get; set; }
-        public string cantidad { get; set; }
+        public int Id { get; set; }
+        public string Nombre { get; set; }
+        public string Categoria { get; set; }
+        public int CantidadEnInventario { get; set; }
+        public string Proveedor { get; set; }
+        public DateTime FechaDeIngreso { get; set; }
+        public string Ubicacion { get; set; }
     }
 }

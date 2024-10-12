@@ -1,45 +1,75 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using WebApplication2.models;
 
 namespace WebApplication2.Controllers
 {
     [ApiController]
-    [Route("semillas")]
-    public class semillascontroller : ControllerBase
+    [Route("api/[controller]")]
+    public class SemillasController : ControllerBase
     {
-        [HttpGet]
-        [Route("listar")]
-        public dynamic listarsemilla()
+        // Datos de ejemplo en memoria para pruebas rápidas
+        private static List<Semilla> semillas = new List<Semilla>
         {
-            List<semilla> semilla = new List<semilla>
+            new Semilla { Id = 1, Nombre = "Maíz", Categoria = "Cereal", CantidadEnInventario = 100, Proveedor = "Proveedor A", FechaDeIngreso = DateTime.Now, Ubicacion = "Bodega 1" },
+            new Semilla { Id = 2, Nombre = "Girasol", Categoria = "Oleaginosa", CantidadEnInventario = 50, Proveedor = "Proveedor B", FechaDeIngreso = DateTime.Now, Ubicacion = "Bodega 2" }
+        };
+
+        [HttpGet]
+        public ActionResult<IEnumerable<Semilla>> GetSemillas()
+        {
+            return Ok(semillas);
+        }
+
+        [HttpGet("{id}")]
+        public ActionResult<Semilla> GetSemilla(int id)
+        {
+            var semilla = semillas.FirstOrDefault(s => s.Id == id);
+            if (semilla == null)
             {
-                new semilla
-                {
-                    id="1",
-                   nombre="calabaza",
-                   cantidad="10000",
-                    
-                }
+                return NotFound();
+            }
+            return Ok(semilla);
+        }
 
+        [HttpPost]
+        public ActionResult<Semilla> CreateSemilla(Semilla nuevaSemilla)
+        {
+            nuevaSemilla.Id = semillas.Max(s => s.Id) + 1;
+            semillas.Add(nuevaSemilla);
+            return CreatedAtAction(nameof(GetSemilla), new { id = nuevaSemilla.Id }, nuevaSemilla);
+        }
 
-                /* new cliente
+        [HttpPut("{id}")]
+        public IActionResult UpdateSemilla(int id, Semilla semillaActualizada)
+        {
+            var semilla = semillas.FirstOrDefault(s => s.Id == id);
+            if (semilla == null)
+            {
+                return NotFound();
+            }
 
-                {
-                    id="2",
-                    correo="pruebas2@gmail.com",
-                    edad="24",
-                    nombre="pepe"
-                }
-                */
+            semilla.Nombre = semillaActualizada.Nombre;
+            semilla.Categoria = semillaActualizada.Categoria;
+            semilla.CantidadEnInventario = semillaActualizada.CantidadEnInventario;
+            semilla.Proveedor = semillaActualizada.Proveedor;
+            semilla.FechaDeIngreso = semillaActualizada.FechaDeIngreso;
+            semilla.Ubicacion = semillaActualizada.Ubicacion;
 
-            };
+            return NoContent();
+        }
 
-            return semilla;
-            //}
-            //[HttpPost]
-            //[Route("guardar")]
-            //public dynamic guardarcliente()
-            //}
+        [HttpDelete("{id}")]
+        public IActionResult DeleteSemilla(int id)
+        {
+            var semilla = semillas.FirstOrDefault(s => s.Id == id);
+            if (semilla == null)
+            {
+                return NotFound();
+            }
+
+            semillas.Remove(semilla);
+            return NoContent();
         }
     }
 }
