@@ -1,73 +1,98 @@
-﻿namespace WebApplication2.Controllers;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using WebApplication2.Data;
 using WebApplication2.models;
+using WebApplication2.Models; // Asegúrate de que el namespace sea correcto
 
-    [ApiController]
-[Route("api/[controller]")]
-
-public class InventarioController : ControllerBase
+namespace WebApplication2.Controllers
 {
-    // Datos de ejemplo en memoria para pruebas rápidas
-    private static List<MovimientoInventario> inventario = new List<MovimientoInventario>
+    [ApiController]
+    [Route("api/[controller]")]
+    public class InventarioController : ControllerBase
+    {
+        private readonly ApplicationDbContext _context;
+
+        public InventarioController(ApplicationDbContext context)
         {
-            new MovimientoInventario { Id = 1, SemillaId = 1, FechaMovimiento = DateTime.Now, TipoMovimiento = "Ingreso", Cantidad = 100, Observaciones = "Ingreso inicial" },
-            new MovimientoInventario { Id = 2, SemillaId = 2, FechaMovimiento = DateTime.Now, TipoMovimiento = "Egreso", Cantidad = 20, Observaciones = "Venta" }
-        };
-
-    [HttpGet]
-    public ActionResult<IEnumerable<MovimientoInventario>> GetMovimientosInventario()
-    {
-        return Ok(inventario);
-    }
-
-    [HttpGet("{id}")]
-    public ActionResult<MovimientoInventario> GetMovimientoInventario(int id)
-    {
-        var movimiento = inventario.FirstOrDefault(m => m.Id == id);
-        if (movimiento == null)
-        {
-            return NotFound();
-        }
-        return Ok(movimiento);
-    }
-
-    [HttpPost]
-    public ActionResult<MovimientoInventario> CreateMovimientoInventario(MovimientoInventario nuevoMovimiento)
-    {
-        nuevoMovimiento.Id = inventario.Max(m => m.Id) + 1;
-        inventario.Add(nuevoMovimiento);
-        return CreatedAtAction(nameof(GetMovimientoInventario), new { id = nuevoMovimiento.Id }, nuevoMovimiento);
-    }
-
-    [HttpPut("{id}")]
-    public IActionResult UpdateMovimientoInventario(int id, MovimientoInventario movimientoActualizado)
-    {
-        var movimiento = inventario.FirstOrDefault(m => m.Id == id);
-        if (movimiento == null)
-        {
-            return NotFound();
+            _context = context;
         }
 
-        movimiento.SemillaId = movimientoActualizado.SemillaId;
-        movimiento.FechaMovimiento = movimientoActualizado.FechaMovimiento;
-        movimiento.TipoMovimiento = movimientoActualizado.TipoMovimiento;
-        movimiento.Cantidad = movimientoActualizado.Cantidad;
-        movimiento.Observaciones = movimientoActualizado.Observaciones;
-
-        return NoContent();
-    }
-
-    [HttpDelete("{id}")]
-    public IActionResult DeleteMovimientoInventario(int id)
-    {
-        var movimiento = inventario.FirstOrDefault(m => m.Id == id);
-        if (movimiento == null)
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<MovimientoInventario>>> GetMovimientosInventario()
         {
-            return NotFound();
+            var inventarioMovimientos = await _context.Inventario.ToListAsync();
+            return Ok(inventarioMovimientos);
         }
 
-        inventario.Remove(movimiento);
-        return NoContent();
+        [HttpGet("{id}")]
+        public async Task<ActionResult<MovimientoInventario>> GetMovimientoInventario(int id)
+        {
+            var movimiento = await _context.Inventario.FindAsync(id);
+            if (movimiento == null)
+            {
+                return NotFound();
+            }
+            return Ok(movimiento);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<MovimientoInventario>> CreateMovimientoInventario(MovimientoInventario nuevoMovimiento)
+        {
+            _context.Inventario.Add(nuevoMovimiento);
+            await _context.SaveChangesAsync();
+            return CreatedAtAction(nameof(GetMovimientoInventario), new { id = nuevoMovimiento.Id }, nuevoMovimiento);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateMovimientoInventario(int id, MovimientoInventario movimientoActualizado)
+        {
+            if (id != movimientoActualizado.Id)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(movimientoActualizado).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!MovimientoInventarioExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteMovimientoInventario(int id)
+        {
+            var movimiento = await _context.Inventario.FindAsync(id);
+            if (movimiento == null)
+            {
+                return NotFound();
+            }
+
+            _context.Inventario.Remove(movimiento);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        private bool MovimientoInventarioExists(int id)
+        {
+            return _context.Inventario.Any(e => e.Id == id);
+        }
     }
 }
-
