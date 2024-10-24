@@ -28,9 +28,10 @@ namespace Sowing_O2.Utilities
 
             var claims = new[]
             {
-            new Claim(ClaimTypes.Name, usuario.Nombre),
-            new Claim(ClaimTypes.Email, usuario.Correo)
-        };
+        new Claim(ClaimTypes.Name, usuario.Nombre),
+        new Claim(ClaimTypes.Email, usuario.Correo),
+        new Claim(ClaimTypes.Role, usuario.IdRol.ToString())  // Agregar el Rol al token
+    };
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -52,5 +53,6 @@ namespace Sowing_O2.Utilities
                 TiempoExpiracion = expireTime
             };
         }
+
     }
 }

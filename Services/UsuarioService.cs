@@ -60,7 +60,7 @@ namespace Sowing_O2.Services
                     IdRol = usuarioDto.IdRol
                 };
 
-                // Guardar en la base de datos
+  
                 await _emailSender.SendEmailAsync(usuarioDto.Correo, "Registro exitoso", @"
                     <!DOCTYPE html>
                     <html lang='en'>
@@ -88,6 +88,28 @@ namespace Sowing_O2.Services
             }
         }
 
+        public async Task<bool> EliminarUsuarioAsync(string correo)
+        {
+            try
+            {
+                // Obtener el usuario por su correo
+                var usuario = await _usuarioRepository.GetUsuarioPorCorreoModelo(correo);
+
+                if (usuario == null)
+                {
+                    return false; // Usuario no encontrado
+                }
+
+                // Eliminar el usuario del repositorio
+                _usuarioRepository.DeleteUsuario(usuario);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error inesperado al eliminar el usuario: {ex.Message}");
+            }
+        }
 
         public async Task<LoginResponseDto> Login(LoginDto loginDto)
         {

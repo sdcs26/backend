@@ -17,15 +17,15 @@ namespace Sowing_O2.Repositories
             var revokedToken = new TokenRevocado
             {
                 Token = token,
-                fechaRevocado = DateTime.UtcNow
+                FechaRevocado = DateTime.UtcNow
             };
-            _context.TokenRevocado.Add(revokedToken);
+            _context.TokenRevocados.Add(revokedToken);
             _context.SaveChanges();
         }
 
         public bool IsTokenRevoked(string token)
         {
-            return _context.TokenRevocado.Any(rt => rt.Token == token);
+            return _context.TokenRevocados.Any(rt => rt.Token == token);
         }
     }
 }

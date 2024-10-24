@@ -14,18 +14,18 @@ namespace Sowing_O2.Repositories
 
         public async Task AddRecuperacionTokenAsync(RecuperacionToken token)
         {
-            await _context.RecuperacionToken.AddAsync(token);
+            await _context.RecuperacionTokens.AddAsync(token);
             await _context.SaveChangesAsync();
         }
 
         public async Task<RecuperacionToken> GetTokenByCorreoAsync(string correo)
         {
-            return await _context.RecuperacionToken.FirstOrDefaultAsync(t => t.Correo == correo);
+            return await _context.RecuperacionTokens.FirstOrDefaultAsync(t => t.Correo == correo);
         }
 
         public async Task<RecuperacionToken> GetTokenAsync(string token)
         {
-            return await _context.RecuperacionToken.FirstOrDefaultAsync(t => t.Token == token);
+            return await _context.RecuperacionTokens.FirstOrDefaultAsync(t => t.Token == token);
         }
 
     }

@@ -24,6 +24,10 @@ builder.Services.AddScoped<ISecurityService, SecurityService>();
 builder.Services.AddDbContext<SowingO2PruebaContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("GerentePolicy", policy => policy.RequireClaim("role", "2"));
+});
 
 builder.Services.AddScoped<UsuarioRepositories>();
 builder.Services.AddScoped<UsuarioService>();
@@ -60,7 +64,13 @@ builder.Services.AddAuthentication(options =>
         ClockSkew = TimeSpan.Zero
     };
 });
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        builder => builder.AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+});
 var app = builder.Build();
 
 
@@ -69,6 +79,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sowing O2 API v1"));
 }
+app.UseHttpsRedirection();
+
+app.UseCors("AllowAll");
+
+app.MapControllers();
 
 app.UseHttpsRedirection();
 

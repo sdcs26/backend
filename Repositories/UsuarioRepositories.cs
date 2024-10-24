@@ -15,6 +15,11 @@ namespace Sowing_O2.Repositories
         {
             _context = context;
         }
+        public void DeleteUsuario(Usuario usuario)
+        {
+            _context.Usuarios.Remove(usuario);
+            _context.SaveChanges();
+        }
 
         public void AddUsuario(Usuario usuario)
         {
@@ -51,10 +56,7 @@ namespace Sowing_O2.Repositories
             _context.Usuarios.Update(usuario);
             await _context.SaveChangesAsync();
         }
-        public async Task EliminarRegistrosDuplicadosPorCorreoAsync(string correo)
-        {
-            await _context.Database.ExecuteSqlRawAsync("EXEC EliminarUsuariosDuplicadosPorCorreo @Correo", new SqlParameter("@Correo", correo));
-        }
+        
         public async Task<Usuario> GetUsuarioPorCorreoModelo(string correo)
         {
             return await _context.Usuarios.FirstOrDefaultAsync(u => u.Correo.Equals(correo));

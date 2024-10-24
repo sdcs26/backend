@@ -5,6 +5,8 @@ using Sowing_O2.Repositories.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Sowing_O2.Utilities;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace Sowing_O2.Controllers
 {
@@ -21,15 +23,24 @@ namespace Sowing_O2.Controllers
         {
             _usuarioService = usuarioService;
             _authService = authService;
-            
             _recuperarContrasenaService = recuperarContrasenaService;
         }
+
+        [Authorize]
         [HttpPost]
         [Route("CrearUsuario")]
         public async Task<IActionResult> CrearUsuario([FromBody] UsuarioDto usuarioDto)
         {
             try
             {
+                
+                var usuarioLogueadoRol = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+
+                if (usuarioLogueadoRol == null || usuarioLogueadoRol != "2")
+                {
+                    return Forbid("Acceso denegado: Solo los gerentes pueden crear usuarios.");
+                }
+
                 await _usuarioService.CrearUsuarioAsync(usuarioDto);
                 return Ok(new { mensaje = "Usuario creado exitosamente." });
             }
@@ -38,6 +49,38 @@ namespace Sowing_O2.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [Authorize]
+        [HttpDelete]
+        [Route("EliminarUsuario/{correo}")]
+        public async Task<IActionResult> DeleteUsuario(string correo)
+        {
+            try
+            {
+                
+                var usuarioLogueadoRol = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+
+                if (usuarioLogueadoRol == null || usuarioLogueadoRol != "2") 
+                {
+                    return Forbid("Acceso denegado: Solo los gerentes pueden eliminar usuarios.");
+                }
+
+                
+                var resultado = await _usuarioService.EliminarUsuarioAsync(correo);
+
+                if (!resultado)
+                {
+                    return NotFound(new { mensaje = "El usuario no existe o no pudo ser eliminado." });
+                }
+
+                return Ok(new { mensaje = "Usuario eliminado exitosamente." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { mensaje = $"Error al eliminar el usuario: {ex.Message}" });
+            }
+        }
+
+
         [HttpPost]
         [Route("Login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
@@ -74,7 +117,7 @@ namespace Sowing_O2.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPost("RecuperarContraseña")]
+        [HttpPost("RecuperarContrasena")]
         public async Task<IActionResult> EnviarToken([FromBody] RecuperarContrasenaDto dto)
         {
             try
@@ -88,7 +131,7 @@ namespace Sowing_O2.Controllers
             }
         }
 
-        [HttpPost("ConfirmarTokenContraseña")]
+        [HttpPost("ConfirmarTokenContrasena")]
         public async Task<IActionResult> Confirmar([FromBody] ConfirmarRecuperarContrasenaDto dto)
         {
             try
@@ -101,12 +144,24 @@ namespace Sowing_O2.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpGet]
+        [Authorize(Roles = "2")] 
+        [HttpGet("listarUsuarios")]
         public IActionResult ObtenerUsuarios()
         {
             var usuarios = _usuarioService.ObtenerUsuarios();
             return Ok(usuarios);
         }
-    }
+        [HttpGet("ServicioProtegido")]
+        public IActionResult ServicioProtegido()
+        {
+            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+            if (!_authService.IsTokenValid(token))
+            {
+                return Unauthorized("Token inválido o revocado.");
+            }
+            return Ok("Acceso permitido.");
+        }
+    }  
 }
 

@@ -25,20 +25,6 @@ namespace Sowing_O2.Services
         {
             return !_tokenRepository.IsTokenRevoked(token);
         }
-
-        public async Task InvokeAsync(HttpContext context)
-        {
-            string token = context.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            if (IsTokenValid(token))
-            {
-                await context.Response.WriteAsync("El token es válido.");
-            }
-            else
-            {
-                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                await context.Response.WriteAsync("El token ha sido revocado.");
-            }
-        }
     }
 }
 
