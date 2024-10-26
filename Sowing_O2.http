@@ -1,0 +1,6 @@
+@Sowing_O2_HostAddress = http://localhost:5005
+
+GET {{Sowing_O2_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
