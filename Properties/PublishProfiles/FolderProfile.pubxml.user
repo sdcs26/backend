@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+https://go.microsoft.com/fwlink/?LinkID=208121.
+-->
+<Project>
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <_PublishTargetUrl>C:\inetpub\wwwroot\Software</_PublishTargetUrl>
+    <History>True|2024-05-12T20:32:35.9575750Z;False|2024-05-12T15:29:52.2979351-05:00;False|2024-05-12T15:27:29.6432482-05:00;False|2024-05-12T15:26:50.2594538-05:00;False|2024-05-12T15:25:44.0312919-05:00;True|2024-05-11T21:30:34.4717579-05:00;True|2024-05-11T21:08:12.7221639-05:00;True|2024-05-11T20:57:44.6067836-05:00;False|2024-05-11T20:55:58.9524460-05:00;True|2024-05-11T20:21:33.0614093-05:00;True|2024-05-11T18:42:52.6609939-05:00;</History>
+    <LastFailureDetails />
+  </PropertyGroup>
+  <ItemGroup>
+    <DestinationConnectionStrings Include="SWConnection">
+      <Value>Server=LAPTOP-IAL4D11K%3bDatabase=Sowing_o2%3b User ID=aleja%3b Password=Barco1819%2a%3b</Value>
+    </DestinationConnectionStrings>
+  </ItemGroup>
+</Project>

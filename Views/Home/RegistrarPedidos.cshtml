@@ -1,0 +1,73 @@
+﻿@{
+    ViewData["Title"] = "Editar Cantidad";
+    Layout = "_Administrador";
+}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actualizar Cantidad</title>
+</head>
+
+<body class="bg-gradient-primary">
+
+    <div class="container">
+
+        <div class="card o-hidden border-0 shadow-lg my-5">
+            <div class="card-body p-0">
+                <div>
+                    <div class="p-5">
+                        <!-- Nested Row within Card Body -->
+
+                        <div class="text-center">
+                            <h1 class="h4 text-gray-900 mb-4">Añadir Pedido</h1>
+                        </div>
+                        <form class="user" onsubmit="cambiarEstadoPedido(); return false;">
+
+                            <div class="form-group">
+                                <input class="form-control form-control-user" placeholder="Numero de Pedido" type="text" id="numeroPedido" required>
+                            </div>
+                            <div class="form-group">
+                                <input class="form-control form-control-user" placeholder="Id de Estado" type="number" id="estadoId" required>
+                            </div>
+                            <div class="form-group">
+                                <textarea class="form-control form-control-user" placeholder="Detalles del envio (Opcional)" id="notasEnvio"></textarea>
+                            </div>
+                            <div id="semillasContainer">
+                                <h1 class="h4 text-gray-900 mb-4">Semillas del pedido</h1>
+                                <!-- Contenedor para las semillas agregadas -->
+                            </div>
+
+                            <a onclick="agregarSemilla()" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm">
+                                    <i class="fas fa-pen"></i> Agregar Semilla al Pedido
+                            </a>
+                            <hr>
+
+                            <button class="btn btn-success btn-user btn-block" type="submit">
+                                Registrar
+                            </button>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </div>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="~/Content/vendor/jquery/jquery.min.js"></script>
+    <script src="~/Content/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="~/Content/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="~/Content/js/sb-admin-2.min.js"></script>
+
+</body>
+
+</html>
