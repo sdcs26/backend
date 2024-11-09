@@ -20,6 +20,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddScoped<ISecurityService, SecurityService>();
+builder.Services.AddScoped<ISemillaService, SemillaService>();
+builder.Services.AddScoped<ISemillaRepositories, SemillaRepository>();
+builder.Services.AddScoped<IPedidoRepositories, PedidoRepositories>();
+builder.Services.AddScoped<IPedidoService, PedidoService>();
+builder.Services.AddScoped<IMovimientoRepositories, MovimientoRepositories>();
 
 builder.Services.AddDbContext<SowingO2PruebaContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));

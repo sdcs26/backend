@@ -9,11 +9,6 @@ namespace Sowing_O2.Repositories.Models;
 public partial class Ubicacion
 {
     /// <summary>
-    /// Identificador único de la ubicación.
-    /// </summary>
-    public int Id { get; set; }
-
-    /// <summary>
     /// ID de la semilla relacionada a la ubicación.
     /// </summary>
     public int IdSemilla { get; set; }

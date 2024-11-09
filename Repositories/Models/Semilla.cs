@@ -26,7 +26,7 @@ public partial class Semilla
     /// <summary>
     /// Descripción de la semilla.
     /// </summary>
-    public string Description { get; set; } = null!;
+    public string Descripcion { get; set; } = null!;
 
     /// <summary>
     /// Cantidad de semillas disponibles.
@@ -38,9 +38,11 @@ public partial class Semilla
     /// </summary>
     public int IdCategoria { get; set; }
 
+    public string Ubicacion { get; set; } = null!;
+
     public virtual Categorium IdCategoriaNavigation { get; set; } = null!;
 
     public virtual ICollection<Movimiento> Movimientos { get; set; } = new List<Movimiento>();
 
-    public virtual ICollection<Ubicacion> Ubicacions { get; set; } = new List<Ubicacion>();
+    public virtual ICollection<PedidoDetalle> PedidoDetalles { get; set; } = new List<PedidoDetalle>();
 }

@@ -17,4 +17,6 @@ public partial class Estado
     /// Nombre del estado.
     /// </summary>
     public string Nombre { get; set; } = null!;
+
+    public virtual ICollection<Pedido> Pedidos { get; set; } = new List<Pedido>();
 }

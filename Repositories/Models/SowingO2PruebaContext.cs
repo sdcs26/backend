@@ -25,6 +25,8 @@ public partial class SowingO2PruebaContext : DbContext
 
     public virtual DbSet<Pedido> Pedidos { get; set; }
 
+    public virtual DbSet<PedidoDetalle> PedidoDetalles { get; set; }
+
     public virtual DbSet<RecuperacionToken> RecuperacionTokens { get; set; }
 
     public virtual DbSet<Rol> Rols { get; set; }
@@ -90,7 +92,11 @@ public partial class SowingO2PruebaContext : DbContext
 
         modelBuilder.Entity<Categorium>(entity =>
         {
-            entity.ToTable(tb => tb.HasComment("Tabla que almacena las categorías de las semillas."));
+            entity.ToTable(tb =>
+                {
+                    tb.HasComment("Tabla que almacena las categorías de las semillas.");
+                    tb.HasTrigger("trg_EvitarEliminarCategoriaConSemillas");
+                });
 
             entity.Property(e => e.Id)
                 .HasComment("Identificador único de la categoría.")
@@ -157,31 +163,39 @@ public partial class SowingO2PruebaContext : DbContext
 
         modelBuilder.Entity<Pedido>(entity =>
         {
-            entity.ToTable(tb => tb.HasComment("Tabla que almacena los pedidos realizados por los usuarios."));
+            entity.HasKey(e => e.Id).HasName("PK__Pedidos__3214EC073E344CA2");
 
-            entity.Property(e => e.Id)
-                .HasComment("Identificador único del pedido.")
-                .HasColumnName("id");
-            entity.Property(e => e.FechaPedido)
-                .HasComment("Fecha en la que se realizó el pedido.")
-                .HasColumnType("datetime")
-                .HasColumnName("fecha_Pedido");
-            entity.Property(e => e.IdEstado)
-                .HasMaxLength(50)
-                .IsUnicode(false)
-                .HasComment("Estado actual del pedido (por ejemplo: En proceso, Enviado, Entregado).")
-                .HasColumnName("id_Estado");
-            entity.Property(e => e.IdUsuario)
-                .HasComment("ID del usuario que realizó el pedido.")
-                .HasColumnName("id_Usuario");
-            entity.Property(e => e.TotalItem)
-                .HasComment("Número total de ítems en el pedido.")
-                .HasColumnName("total_Item");
+            entity.ToTable("Pedido", tb => tb.HasTrigger("trg_VerificarNumeroPedidoUnico"));
 
-            entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.Pedidos)
-                .HasForeignKey(d => d.IdUsuario)
+            entity.HasIndex(e => e.NumeroPedido, "UQ__Pedidos__E4D1815E4C580754").IsUnique();
+
+            entity.Property(e => e.FechaCreacion)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.NotasEnvio).HasMaxLength(255);
+            entity.Property(e => e.NumeroPedido).HasMaxLength(50);
+
+            entity.HasOne(d => d.Estado).WithMany(p => p.Pedidos)
+                .HasForeignKey(d => d.EstadoId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Pedidos_User");
+                .HasConstraintName("FK_Pedido_Estado");
+        });
+
+        modelBuilder.Entity<PedidoDetalle>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__PedidoDe__3214EC079AA5874E");
+
+            entity.ToTable("PedidoDetalle");
+
+            entity.HasOne(d => d.Pedido).WithMany(p => p.PedidoDetalles)
+                .HasForeignKey(d => d.PedidoId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PedidoDetalle_Pedido");
+
+            entity.HasOne(d => d.Semilla).WithMany(p => p.PedidoDetalles)
+                .HasForeignKey(d => d.SemillaId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PedidoDetalle_Semilla");
         });
 
         modelBuilder.Entity<RecuperacionToken>(entity =>
@@ -239,11 +253,11 @@ public partial class SowingO2PruebaContext : DbContext
                 .IsUnicode(false)
                 .HasComment("Código único para identificar la semilla.")
                 .HasColumnName("codigo");
-            entity.Property(e => e.Description)
+            entity.Property(e => e.Descripcion)
                 .HasMaxLength(255)
                 .IsUnicode(false)
                 .HasComment("Descripción de la semilla.")
-                .HasColumnName("description");
+                .HasColumnName("descripcion");
             entity.Property(e => e.IdCategoria)
                 .HasComment("ID de la categoría a la que pertenece la semilla.")
                 .HasColumnName("id_Categoria");
@@ -252,6 +266,10 @@ public partial class SowingO2PruebaContext : DbContext
                 .IsUnicode(false)
                 .HasComment("Nombre de la semilla.")
                 .HasColumnName("nombre");
+            entity.Property(e => e.Ubicacion)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("ubicacion");
 
             entity.HasOne(d => d.IdCategoriaNavigation).WithMany(p => p.Semillas)
                 .HasForeignKey(d => d.IdCategoria)
@@ -278,11 +296,10 @@ public partial class SowingO2PruebaContext : DbContext
 
         modelBuilder.Entity<Ubicacion>(entity =>
         {
-            entity.ToTable("Ubicacion", tb => tb.HasComment("Tabla que almacena las ubicaciones de las semillas."));
+            entity
+                .HasNoKey()
+                .ToTable("Ubicacion", tb => tb.HasComment("Tabla que almacena las ubicaciones de las semillas."));
 
-            entity.Property(e => e.Id)
-                .HasComment("Identificador único de la ubicación.")
-                .HasColumnName("id");
             entity.Property(e => e.CodigoUbi)
                 .HasMaxLength(50)
                 .IsUnicode(false)
@@ -292,7 +309,7 @@ public partial class SowingO2PruebaContext : DbContext
                 .HasComment("ID de la semilla relacionada a la ubicación.")
                 .HasColumnName("id_Semilla");
 
-            entity.HasOne(d => d.IdSemillaNavigation).WithMany(p => p.Ubicacions)
+            entity.HasOne(d => d.IdSemillaNavigation).WithMany()
                 .HasForeignKey(d => d.IdSemilla)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Ubicacion_Semilla");
@@ -307,6 +324,7 @@ public partial class SowingO2PruebaContext : DbContext
                     tb.HasComment("Tabla que almacena los datos de los usuarios registrados en el sistema.");
                     tb.HasTrigger("TR_Auditoria_Usuarios_Delete");
                     tb.HasTrigger("TR_Auditoria_Usuarios_Insert");
+                    tb.HasTrigger("trg_ValidarFormatoCorreo");
                 });
 
             entity.Property(e => e.Id)
