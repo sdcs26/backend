@@ -43,6 +43,8 @@ public partial class Usuario
     /// </summary>
     public int IdRol { get; set; }
 
+    public bool? IsActive { get; set; }
+
     public virtual Rol IdRolNavigation { get; set; } = null!;
 
     public virtual ICollection<Movimiento> Movimientos { get; set; } = new List<Movimiento>();

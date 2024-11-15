@@ -44,7 +44,8 @@ namespace Sowing_O2.Repositories
                 Apellido = user.Apellido,
                 Correo = user.Correo,
                 Contrasena = user.Contrasena,
-                IdRol = user.IdRol
+                IdRol = user.IdRol,
+                IsActive = user.IsActive  
             };
         }
         public Usuario GetUsuarioPorNumeroDocumento(int numDocumento)
@@ -61,6 +62,11 @@ namespace Sowing_O2.Repositories
         {
             return await _context.Usuarios.FirstOrDefaultAsync(u => u.Correo.Equals(correo));
         }
-
+        public void InhabilitarUsuario(Usuario usuario)
+        {
+            usuario.IsActive = false;  
+            _context.Usuarios.Update(usuario);
+            _context.SaveChanges();
+        }
     }
 }

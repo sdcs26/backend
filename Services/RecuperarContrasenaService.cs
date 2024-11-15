@@ -105,7 +105,7 @@ namespace Sowing_O2.Services
                                     Hemos recibido una solicitud para restablecer tu contraseña. Si realizaste esta solicitud, usa el siguiente token para completar el proceso:
                                 </div>
                                 <div class=""token-box"">
-                                    <p>{{token}}</p>
+                                    <p>{token}</p>
                                 </div>
                                 <div class=""logo"">
                                     <img src=""https://i.pinimg.com/736x/cd/86/7c/cd867c50a0ee3dae78b7050a7a16f09a.jpg"" alt=""Sowing O2 Logo"" width=""150"">

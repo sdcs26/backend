@@ -8,6 +8,7 @@
         public string Correo { get; set; } = string.Empty;
         public string Contrasena { get; set; } = string.Empty;
         public int IdRol { get; set; }
+        public bool? IsActive { get; set; }  // Permitir null
     }
 
     public class LoginDto

@@ -165,7 +165,7 @@ public partial class SowingO2PruebaContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Pedidos__3214EC073E344CA2");
 
-            entity.ToTable("Pedido", tb => tb.HasTrigger("trg_VerificarNumeroPedidoUnico"));
+            entity.ToTable("Pedido");
 
             entity.HasIndex(e => e.NumeroPedido, "UQ__Pedidos__E4D1815E4C580754").IsUnique();
 
@@ -347,6 +347,7 @@ public partial class SowingO2PruebaContext : DbContext
             entity.Property(e => e.IdRol)
                 .HasComment("ID del rol asignado al usuario.")
                 .HasColumnName("id_Rol");
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.Nombre)
                 .HasMaxLength(50)
                 .IsUnicode(false)

@@ -151,6 +151,19 @@ namespace Sowing_O2.Controllers
             var usuarios = _usuarioService.ObtenerUsuarios();
             return Ok(usuarios);
         }
+        [HttpPatch("InhabilitarUsuario/{correo}")]
+        public async Task<IActionResult> InhabilitarUsuario(string correo)
+        {
+            var resultado = await _usuarioService.InhabilitarUsuarioAsync(correo);
+            return resultado ? Ok(new { mensaje = "Usuario inhabilitado con éxito" }) : NotFound(new { mensaje = "Usuario no encontrado" });
+        }
+
+        [HttpPatch("ActivarUsuario/{correo}")]
+        public async Task<IActionResult> ActivarUsuario(string correo)
+        {
+            var resultado = await _usuarioService.ActivarUsuarioAsync(correo);
+            return resultado ? Ok(new { mensaje = "Usuario activado con éxito" }) : NotFound(new { mensaje = "Usuario no encontrado" });
+        }
         [HttpGet("ServicioProtegido")]
         public IActionResult ServicioProtegido()
         {
@@ -162,6 +175,7 @@ namespace Sowing_O2.Controllers
             }
             return Ok("Acceso permitido.");
         }
-    }  
+
+    }
 }
 

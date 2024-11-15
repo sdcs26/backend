@@ -57,10 +57,11 @@ namespace Sowing_O2.Services
                     Apellido = usuarioDto.Apellido,
                     Correo = usuarioDto.Correo,
                     Contrasena = hashedPassword,
-                    IdRol = usuarioDto.IdRol
+                    IdRol = usuarioDto.IdRol,
+                    IsActive = true  // Establece el nuevo usuario como activo
                 };
 
-  
+
                 await _emailSender.SendEmailAsync(usuarioDto.Correo, "Registro exitoso", @"
                     <!DOCTYPE html>
                     <html lang='en'>
@@ -110,22 +111,17 @@ namespace Sowing_O2.Services
                 throw new Exception($"Error inesperado al eliminar el usuario: {ex.Message}");
             }
         }
-
         public async Task<LoginResponseDto> Login(LoginDto loginDto)
         {
             var usuario = await _usuarioRepository.GetUsuarioPorCorreo(loginDto.Correo);
 
-            if (usuario == null || !_securityService.VerifyPassword(loginDto.Contrasena, usuario.Contrasena))
+            if (usuario == null || usuario.IsActive != true || !_securityService.VerifyPassword(loginDto.Contrasena, usuario.Contrasena))
             {
-                throw new Exception("Credenciales inválidas.");
+                throw new Exception("Credenciales inválidas o usuario inactivo.");
             }
-
-            // Generar token JWT
             var loginResponseDto = JwtUtility.GenTokenkey(usuario, _jwtSettings);
-
             return loginResponseDto;
         }
-        
 
         public List<UsuarioDto> ObtenerUsuarios()
         {
@@ -136,8 +132,55 @@ namespace Sowing_O2.Services
                 Nombre = u.Nombre,
                 Apellido = u.Apellido,
                 Correo = u.Correo,
-                IdRol = u.IdRol
+                IdRol = u.IdRol,
+                IsActive = u.IsActive ?? false  
             }).ToList();
         }
+
+
+        public async Task<bool> InhabilitarUsuarioAsync(string correo)
+        {
+            try
+            {
+                var usuario = await _usuarioRepository.GetUsuarioPorCorreoModelo(correo);
+
+                if (usuario == null)
+                {
+                    return false;
+                }
+
+                _usuarioRepository.InhabilitarUsuario(usuario);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error inesperado al inhabilitar el usuario: {ex.Message}");
+            }
+        }
+        public async Task<bool> ActivarUsuarioAsync(string correo)
+        {
+            try
+            {
+                // Obtener el usuario por su correo
+                var usuario = await _usuarioRepository.GetUsuarioPorCorreoModelo(correo);
+
+                if (usuario == null)
+                {
+                    return false; // Usuario no encontrado
+                }
+
+                // Activar el usuario
+                usuario.IsActive = true;
+                await _usuarioRepository.UpdateUsuario(usuario); // Actualizar en la base de datos
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error inesperado al activar el usuario: {ex.Message}");
+            }
+        }
+
+
     }
 }
