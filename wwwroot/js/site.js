@@ -1,44 +1,81 @@
-﻿src = "https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"
+﻿src = "https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js";
+
 function getRoleFromToken() {
     const token = getCookie("jwtToken");
-    if (token) {
-        const decoded = jwt_decode(token);
-        return decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
-    }
-    return null;
-}
-let idUsuario;
-function obtenerIdUsuario() {
-    const token = getCookie("jwtToken");
-    if (token) {
-        const decoded = jwt_decode(token);
-        idUsuario = decoded["id"];
-    }
-}
-function getUserIdFromToken() {
-    const token = getCookie("jwtToken");
-    if (token) {
-        const decoded = jwt_decode(token);
-        return decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
-    }
-    return null;
-}
-document.addEventListener("DOMContentLoaded", function () {
-    const userRole = getRoleFromToken();
+    if (!token) return null;
 
-    if (userRole === "Gerente") {
-        document.getElementById("adminOptions").style.display = "block";
-    } else {
-        document.getElementById("adminOptions").style.display = "none";
+    try {
+        const decoded = jwt_decode(token);
+        console.log("Contenido del token decodificado:", decoded);
+        const currentTime = Date.now() / 1000;
+        if (decoded.exp && decoded.exp < currentTime) {
+            console.warn("Token expirado.");
+            setCookie("jwtToken", "", -1);
+            return null;
+        }
+        return decoded["role"] || null;
+    } catch (error) {
+        console.error("Error al decodificar el token:", error);
+        setCookie("jwtToken", "", -1);
+        return null;
     }
-});
+}
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    return parts.length === 2 ? parts.pop().split(';').shift() : null;
+}
+
 function setCookie(name, value, hours) {
     const d = new Date();
     d.setTime(d.getTime() + (hours * 60 * 60 * 1000));
     const expires = "expires=" + d.toUTCString();
-    document.cookie = name + "=" + value + ";" + expires + ";path=/";
+    document.cookie = `${name}=${value}; ${expires}; path=/; Secure`;
 }
+document.addEventListener("DOMContentLoaded", function () {
+    listarSemillas();
+    listarUsuarios();
+    listarPedidos()
+});
+document.addEventListener("DOMContentLoaded", function () {
+    const token = getCookie("jwtToken");
+    const userRole = token ? getRoleFromToken() : null;
+    console.log("Rol del usuario:", userRole);
 
+    
+    const isManager = userRole === "2";
+    const isAdmin = userRole === "1";
+
+    const unprotectedRoutes = ["/Home/Login", "/Home/RecuperarContra", "/Home/LoginExitoso"];
+
+    
+    if (!userRole && !unprotectedRoutes.includes(window.location.pathname)) {
+        console.warn("No se ha encontrado rol o el token es inválido. Redirigiendo al login.");
+        window.location.href = "/Home/Login";
+        return;
+    }
+
+    
+    if (isManager) {
+        console.log("Acceso completo habilitado para el Gerente.");
+        document.querySelectorAll(".nav-link").forEach(link => link.style.display = "block");
+    } else if (isAdmin) {
+        console.log("Acceso restringido para el Administrador.");
+        document.querySelectorAll(".nav-link").forEach(link => {
+            if (link.classList.contains("admin-only")) {
+                link.style.display = "block";
+            } else {
+                link.style.display = "none";
+            }
+        });
+    }else if (!unprotectedRoutes.includes(window.location.pathname)) {
+    console.warn("Redirigiendo al login.");
+    window.location.href = "/Home/Login";
+    }
+    llenarSelectorLetras();
+    llenarSelectorAlturas();
+    
+});
 
 function login() {
     const queryURL = "http://localhost:5005/api/Usuario/Login";
@@ -57,12 +94,10 @@ function login() {
     })
         .then(response => response.json())
         .then(data => {
-            console.log("Respuesta Login");
+            console.log("Respuesta de login:", data);
 
             if (data && data.response && data.response.token) {
-
                 setCookie("jwtToken", data.response.token, 2);
-
                 document.getElementById("remoteResponse").innerText = "Login exitoso.";
                 window.location.href = "/Home/LoginExitoso";
             } else {
@@ -70,22 +105,22 @@ function login() {
             }
         })
         .catch(error => {
-            document.getElementById("remoteResponse").innerText = 'Error de CORS: ' + error;
+            document.getElementById("remoteResponse").innerText = 'Error de CORS o red: ' + error;
         });
 }
 
-
-function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
-}
 function listarUsuarios() {
     const queryURL = "http://localhost:5005/api/Usuario/listarUsuarios";
     const token = getCookie("jwtToken");
-    if (!token) {
-        window.location.href = "/Home/Login";
+
+    if (!token || !getRoleFromToken()) {
+        if (!sessionStorage.getItem("redirected")) {
+            sessionStorage.setItem("redirected", "true");
+            window.location.href = "/Home/Login";
+        }
+        return;
     }
+
     fetch(queryURL, {
         method: 'GET',
         headers: {
@@ -95,53 +130,85 @@ function listarUsuarios() {
         }
     })
         .then(response => {
-            if (!response.ok) {
-                throw new Error('Error en la respuesta de la API');
+            if (response.status === 401) {
+                sessionStorage.setItem("redirected", "true");
+                window.location.href = "/Home/Login";
+                return;
             }
             return response.json();
         })
         .then(data => {
-            console.log("Usuarios obtenidos:", data);
+            const usuariosTableBody = document.getElementById("usuariosTableBody");
+            if (!usuariosTableBody) {
+                console.warn("Elemento 'usuariosTableBody' no encontrado en esta vista.");
+                return;
+            }
 
-            let usuariosTableBody = document.getElementById("usuariosTableBody");
-            usuariosTableBody.innerHTML = ""; 
-
-            
+            usuariosTableBody.innerHTML = "";
             data.forEach(usuario => {
                 usuariosTableBody.innerHTML += `
-            <tr>
-                <td>${usuario.nombre}</td>
-                <td>${usuario.apellido}</td>
-                <td>${usuario.correo}</td>
-                <td>
-                    <a onclick="confirmarEliminacionUsuario('${usuario.correo}')" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm">
-                        <i class="fas fa-trash-alt"></i> Eliminar
-                    </a>
-                </td>
-            </tr>
-        `;
+                <tr>
+                    <td>${usuario.nombre}</td>
+                    <td>${usuario.apellido}</td>
+                    <td>${usuario.correo}</td>
+                    <td>${usuario.isActive ? 'Activo' : 'Inactivo'}</td>
+                    <td>
+                        ${usuario.isActive ?
+                        `<a onclick="confirmarInhabilitacionUsuario('${usuario.correo}')" class="btn btn-danger btn-sm">Inhabilitar</a>` :
+                        `<a onclick="activarUsuario('${usuario.correo}')" class="btn btn-success btn-sm">Activar</a>`
+                    }
+                    </td>
+                </tr>
+            `;
             });
         })
-        .catch(error => {
-            console.error('Error:', error);
-        });
+        .catch(error => console.error('Error al listar usuarios:', error));
 }
-function confirmarEliminacionUsuario(correo) {
-    const confirmacion = confirm(`¿Estás seguro que deseas eliminar al usuario con correo: ${correo}?`);
 
-    if (confirmacion) {
-
-        eliminarUsuario(correo);
-    }
-}
-function eliminarUsuario(correo) {
-    const queryURL = `http://localhost:5005/api/Usuario/EliminarUsuario/${correo}`;
+function activarUsuario(correo) {
+    const queryURL = `http://localhost:5005/api/Usuario/ActivarUsuario/${correo}`;
     const token = getCookie("jwtToken");
-    if (!token) {
-        window.location.href = "/Home/Login";
-    }
+
     fetch(queryURL, {
-        method: 'DELETE',
+        method: 'PATCH',
+        headers: {
+            'Authorization': 'Bearer ' + token,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(response => {
+            if (!response.ok) throw new Error('Error al activar el usuario.');
+            return response.json();
+        })
+        .then(data => {
+            alert(data.mensaje || "Usuario activado exitosamente.");
+            listarUsuarios();
+        })
+        .catch(error => console.error("Error al activar usuario:", error));
+}
+
+function confirmarInhabilitacionUsuario(correo) {
+    const confirmacion = confirm(`¿Estás seguro que deseas inhabilitar al usuario con correo: ${correo}?`);
+    if (confirmacion) {
+        inhabilitarUsuario(correo);
+    }
+}
+
+function inhabilitarUsuario(correo) {
+    const queryURL = `http://localhost:5005/api/Usuario/InhabilitarUsuario/${correo}`;
+    const token = getCookie("jwtToken");
+
+    if (!token || !getRoleFromToken()) {
+        if (!sessionStorage.getItem("redirected")) {
+            sessionStorage.setItem("redirected", "true");
+            window.location.href = "/Home/Login";
+        }
+        return;
+    }
+
+    fetch(queryURL, {
+        method: 'PATCH', // Método PATCH para inhabilitar
         headers: {
             'Authorization': 'Bearer ' + token,
             'Accept': 'application/json',
@@ -150,24 +217,29 @@ function eliminarUsuario(correo) {
     })
         .then(response => {
             if (!response.ok) {
-                throw new Error('Error al eliminar el usuario.');
+                throw new Error('Error al inhabilitar el usuario.');
             }
             return response.json();
         })
         .then(data => {
-            alert(data.mensaje);
+            alert(data.mensaje || "Usuario inhabilitado exitosamente.");
             listarUsuarios();
         })
         .catch(error => {
             console.error('Error:', error);
-            alert("No se pudo eliminar el usuario.");
+            alert("No se pudo inhabilitar el usuario.");
         });
 }
+
 function crearUsuario() {
     const queryURL = "http://localhost:5005/api/Usuario/CrearUsuario";
     const token = getCookie("jwtToken");
-    if (!token) {
-        window.location.href = "/Home/Login";
+    if (!token || !getRoleFromToken()) {
+        if (!sessionStorage.getItem("redirected")) {
+            sessionStorage.setItem("redirected", "true");
+            window.location.href = "/Home/Login";
+        }
+        return;
     }
     const usuario = {
         "nombre": document.getElementById("nombre").value,
@@ -198,6 +270,7 @@ function crearUsuario() {
 
             alert("Usuario creado exitosamente.");
             console.log("Usuario creado:", data);
+            window.location.href = "/Home/ListarUsuarios";
         })
         .catch(error => {
 
@@ -268,9 +341,15 @@ function ConfirmarTokenContrasena() {
 }
 function cerrarSesion() {
     const token = getCookie("jwtToken");
-    if (!token) {
-        window.location.href = "/Home/Login";
+
+    if (!token || !getRoleFromToken()) {
+        if (!sessionStorage.getItem("redirected")) {
+            sessionStorage.setItem("redirected", "true");
+            window.location.href = "/Home/Login";
+        }
+        return;
     }
+
     fetch("http://localhost:5005/api/Usuario/CerrarSesion", {
         method: 'POST',
         headers: {
@@ -280,36 +359,39 @@ function cerrarSesion() {
         }
     })
         .then(response => {
-            if (!response.ok) {
+            if (response.ok) {
+                setCookie("jwtToken", "", -1); 
+                alert("Sesión cerrada correctamente.");
+                window.location.href = "/Home/Login";
+            } else {
                 throw new Error('Error al cerrar sesión');
             }
-            return response.json();
-        })
-        .then(data => {
-
-            setCookie("jwtToken", "", -1);
-            alert(data.mensaje);
-            window.location.href = "/Home/Login";
         })
         .catch(error => {
-            alert("Error cerrando sesión: " + error.message);
+            console.error("Error cerrando sesión:", error);
+            alert("No se pudo cerrar la sesión.");
         });
 }
-document.addEventListener("DOMContentLoaded", function () {
-    listarSemillas();
-    listarUsuarios();
-    listarPedidos()
-});
+
 
 function crearSemilla() {
     const queryURL = "http://localhost:5005/api/Semilla/CrearSemilla";
+    const token = getCookie("jwtToken");
+    if (!token || !getRoleFromToken()) {
+        if (!sessionStorage.getItem("redirected")) {
+            sessionStorage.setItem("redirected", "true");
+            window.location.href = "/Home/Login";
+        }
+        return;
+    }
+    const ubicacion = `${document.getElementById("ubicacionLetra").value}-${document.getElementById("ubicacionNumero1").value}-${document.getElementById("ubicacionNumero2").value}`;
     const nuevaSemilla = {
-        "nombre": document.getElementById("nombre").value,
-        "codigo": document.getElementById("codigo").value,
-        "descripcion": document.getElementById("descripcion").value,
-        "cantidad": parseInt(document.getElementById("cantidad").value),
-        "idCategoria": parseInt(document.getElementById("idCategoria").value),
-        "ubicacion": document.getElementById("ubicacion").value
+        nombre: document.getElementById("nombre").value,
+        codigo: document.getElementById("codigo").value,
+        descripcion: document.getElementById("descripcion").value,
+        cantidad: parseInt(document.getElementById("cantidad").value),
+        idCategoria: parseInt(document.getElementById("idCategoria").value),
+        ubicacion: ubicacion
     };
 
     fetch(queryURL, {
@@ -322,21 +404,47 @@ function crearSemilla() {
     })
         .then(response => {
             if (response.ok) {
-                listarSemillas();
                 alert("Semilla registrada exitosamente.");
                 window.location.href = "/Home/VistaInventario";
             } else {
-                alert("Error al registrar la semilla.");
+                alert("Error al registrar la semilla. Verifique si la ubicación ya está ocupada.");
             }
         })
         .catch(error => {
             console.error("Error:", error);
         });
 }
+function llenarSelectorLetras() {
+    const ubicacionLetra = document.getElementById("ubicacionLetra");
+    ubicacionLetra.innerHTML = '<option value="" disabled selected>Letra (A-Z)</option>';
+    for (let i = 0; i < 26; i++) {
+        const option = document.createElement("option");
+        option.value = String.fromCharCode(65 + i);
+        option.textContent = String.fromCharCode(65 + i);
+        ubicacionLetra.appendChild(option);
+    }
+}
 
+function llenarSelectorAlturas() {
+    const ubicacionNumero2 = document.getElementById("ubicacionNumero2");
+    ubicacionNumero2.innerHTML = '<option value="" disabled selected>Altura (10-70)</option>';
+    for (let i = 1; i <= 7; i++) {
+        const option = document.createElement("option");
+        option.value = i * 10;
+        option.textContent = i * 10;
+        ubicacionNumero2.appendChild(option);
+    }
+}
 function listarSemillas() {
     const queryURL = "http://localhost:5005/api/Semilla";
     const token = getCookie("jwtToken");
+    if (!token || !getRoleFromToken()) {
+        if (!sessionStorage.getItem("redirected")) {
+            sessionStorage.setItem("redirected", "true");
+            window.location.href = "/Home/Login";
+        }
+        return;
+    }
 
     fetch(queryURL, {
         headers: {
@@ -347,49 +455,116 @@ function listarSemillas() {
     })
         .then(response => response.json())
         .then(data => {
+            // Llena la tabla de semillas
             const semillasTableBody = document.getElementById("semillasTableBody");
-            semillasTableBody.innerHTML = "";
+            if (semillasTableBody) {
+                semillasTableBody.innerHTML = "";
+                data.forEach(semilla => {
+                    const row = `
+                    <tr>
+                        <td>${semilla.id}</td>
+                        <td>${semilla.nombre}</td>
+                        <td>${semilla.codigo}</td>
+                        <td>${semilla.descripcion}</td>
+                        <td>${semilla.cantidad}</td>
+                        <td>${semilla.idCategoria}</td>
+                        <td>${semilla.ubicacion}</td>
+                        <td>
+                            <a onclick="window.location.href='/Home/EditarCantidad?id=${semilla.id}'" class="btn btn-success btn-sm">Actualizar Cantidad</a>
+                            <a onclick="window.location.href='/Home/Traslados?id=${semilla.id}'" class="btn btn-dark btn-sm">Hacer Traslado</a>
+                            <a onclick="confirmarEliminacionSemilla('${semilla.id}')" class="btn btn-danger btn-sm">Eliminar</a>
+                        </td>
+                    </tr>
+                    `;
+                    semillasTableBody.innerHTML += row;
+                });
+            }
 
-            data.forEach(semilla => {
-                const row = `
-                <tr>
-                    <td>${semilla.id}</td>
-                    <td>${semilla.nombre}</td>
-                    <td>${semilla.codigo}</td>
-                    <td>${semilla.descripcion}</td>
-                    <td>${semilla.cantidad}</td>
-                    <td>${semilla.idCategoria}</td>
-                    <td>${semilla.ubicacion}</td>
-                    <td>
-                    <a onclick="window.location.href='/Home/EditarCantidad?id=${semilla.id}'" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm">
-                        <i class="fas fa-pen"></i> Actualizar Cantidad
-                    </a>
-                    <a onclick="window.location.href='/Home/Traslados?id=${semilla.id}'" class="d-none d-sm-inline-block btn btn-sm btn-dark shadow-sm">
-                        <i class="fas fa-pen"></i> Hacer Traslado
-                    </a>
-                    <a onclick="confirmarEliminacionSemilla('${semilla.id}')" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm">
-                        <i class="fas fa-trash-alt"></i> Eliminar
-                    </a>
-                    </td>
-                    
-                </tr>
-            `;
-                semillasTableBody.innerHTML += row;
-            });
+            // Llena el select de semillas para los pedidos
+            const semillaSelect = document.getElementById("semillaSelect");
+            if (semillaSelect) {
+                semillaSelect.innerHTML = `<option value="" disabled selected>Selecciona una semilla</option>`;
+                data.forEach(semilla => {
+                    const option = document.createElement("option");
+                    option.value = semilla.id;
+                    option.text = semilla.nombre;
+                    semillaSelect.appendChild(option);
+                });
+            }
         })
         .catch(error => {
             console.error("Error al listar las semillas:", error);
         });
 }
+
+
+
+//function listarSemillas() {
+//    const queryURL = "http://localhost:5005/api/Semilla";
+//    const token = getCookie("jwtToken");
+//    if (!token || !getRoleFromToken()) {
+//        if (!sessionStorage.getItem("redirected")) {
+//            sessionStorage.setItem("redirected", "true");
+//            window.location.href = "/Home/Login";
+//        }
+//        return;
+//    }
+
+//    fetch(queryURL, {
+//        headers: {
+//            'Authorization': 'Bearer ' + token,
+//            'Accept': 'application/json',
+//            'Content-Type': 'application/json'
+//        }
+//    })
+//        .then(response => response.json())
+//        .then(data => {
+//            const semillasTableBody = document.getElementById("semillasTableBody");
+//            semillasTableBody.innerHTML = "";
+
+//            data.forEach(semilla => {
+//                const row = `
+//                <tr>
+//                    <td>${semilla.id}</td>
+//                    <td>${semilla.nombre}</td>
+//                    <td>${semilla.codigo}</td>
+//                    <td>${semilla.descripcion}</td>
+//                    <td>${semilla.cantidad}</td>
+//                    <td>${semilla.idCategoria}</td>
+//                    <td>${semilla.ubicacion}</td>
+//                    <td>
+//                    <a onclick="window.location.href='/Home/EditarCantidad?id=${semilla.id}'" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm">
+//                        <i class="fas fa-pen"></i> Actualizar Cantidad
+//                    </a>
+//                    <a onclick="window.location.href='/Home/Traslados?id=${semilla.id}'" class="d-none d-sm-inline-block btn btn-sm btn-dark shadow-sm">
+//                        <i class="fas fa-pen"></i> Hacer Traslado
+//                    </a>
+//                    <a onclick="confirmarEliminacionSemilla('${semilla.id}')" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm">
+//                        <i class="fas fa-trash-alt"></i> Eliminar
+//                    </a>
+//                    </td>
+                    
+//                </tr>
+//            `;
+//                semillasTableBody.innerHTML += row;
+//            });
+//        })
+//        .catch(error => {
+//            console.error("Error al listar las semillas:", error);
+//        });
+//}
 function actualizarCantidad() {
     const id = new URLSearchParams(window.location.search).get("id");
-    const nuevaCantidad = document.getElementById("nuevaCantidad").value;
 
-    if (!id || !nuevaCantidad) {
-        alert("ID de la semilla o cantidad no válida.");
+    const nuevaCantidad = document.getElementById("nuevaCantidad").value;
+    const token = getCookie("jwtToken");
+    if (!token || !getRoleFromToken()) {
+        if (!sessionStorage.getItem("redirected")) {
+            sessionStorage.setItem("redirected", "true");
+            window.location.href = "/Home/Login";
+        }
         return;
     }
-
     const queryURL = `http://localhost:5005/api/Semilla/cantidad${id}`;
 
     fetch(queryURL, {
@@ -416,9 +591,17 @@ function actualizarCantidad() {
 }
 
 function trasladarSemilla() {
+    if (!token || !getRoleFromToken()) {
+        if (!sessionStorage.getItem("redirected")) {
+            sessionStorage.setItem("redirected", "true");
+            window.location.href = "/Home/Login";
+        }
+        return;
+    }
     const id = new URLSearchParams(window.location.search).get("id");
+    const nuevaUbicacion = `${document.getElementById("ubicacionLetra").value}-${document.getElementById("ubicacionNumero1").value}-${document.getElementById("ubicacionNumero2").value}`;
     const trasladoDto = {
-        nuevaUbicacion: document.getElementById("nuevaUbicacion").value,
+        nuevaUbicacion: nuevaUbicacion,
         idUsuario: parseInt(document.getElementById("idUsuario").value)
     };
     const queryURL = `http://localhost:5005/api/Semilla/traslado${id}`;
@@ -455,7 +638,13 @@ function confirmarEliminacionSemilla(id) {
 
 function eliminarSemilla(id) {
     const queryURL = `http://localhost:5005/api/Semilla/Eliminar${id}`;
-
+    if (!token || !getRoleFromToken()) {
+        if (!sessionStorage.getItem("redirected")) {
+            sessionStorage.setItem("redirected", "true");
+            window.location.href = "/Home/Login";
+        }
+        return;
+    }
     fetch(queryURL, {
         method: 'DELETE',
         headers: {
@@ -480,6 +669,14 @@ function eliminarSemilla(id) {
 }
 function listarPedidos() {
     const queryURL = 'http://localhost:5005/api/Pedido/listar';
+    const token = getCookie("jwtToken");
+    if (!token || !getRoleFromToken()) {
+        if (!sessionStorage.getItem("redirected")) {
+            sessionStorage.setItem("redirected", "true");
+            window.location.href = "/Home/Login";
+        }
+        return;
+    }
     fetch(queryURL)
         .then(response => response.json())
         .then(data => {
@@ -510,6 +707,14 @@ function listarPedidos() {
 function cambiarEstadoPedido() {
     const numeroPedido = new URLSearchParams(window.location.search).get("id");
     const nuevoEstadoId = parseInt(document.getElementById("nuevaEstadoId").value);
+    const token = getCookie("jwtToken");
+    if (!token || !getRoleFromToken()) {
+        if (!sessionStorage.getItem("redirected")) {
+            sessionStorage.setItem("redirected", "true");
+            window.location.href = "/Home/Login";
+        }
+        return;
+    }
 
     if (!numeroPedido || isNaN(nuevoEstadoId)) {
         alert("Número de pedido o estado no válido");
@@ -521,7 +726,7 @@ function cambiarEstadoPedido() {
         NuevoEstadoId: nuevoEstadoId
     };
 
-    // Hacer la solicitud con fetch y manejar las promesas con .then() y .catch()
+    
     fetch("http://localhost:5005/api/pedido/cambiar-estado", {
         method: "PUT",
         headers: {
@@ -545,44 +750,125 @@ function cambiarEstadoPedido() {
         });
 }
 
+//function agregarSemilla() {
+//    const semillasContainer = document.getElementById("semillasContainer");
+//    const semillaHTML = `
+//        <div class="semilla">
+//            <div class="form-group row">
+//                <div class="col-sm-6 mb-3 mb-sm-0">
+//                    <select id="semillaSelect" class="form-control" required>
+//                        <option value="" disabled selected>Selecciona una semilla</option>
+//                    </select>
+//                </div>
+//                <div class="col-sm-6">
+//                    <input class="form-control form-control-user" id="cantidad" placeholder="Cantidad" type="number" required>
+//                </div>
+//            </div>
+//            <a onclick="eliminarSemilla(this)" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm">
+//                <i class="fas fa-pen"></i> Eliminar
+//            </a>
+//            <br><br>
+//        </div>
+//    `;
+//    semillasContainer.insertAdjacentHTML("beforeend", semillaHTML);
+//}
 function agregarSemilla() {
     const semillasContainer = document.getElementById("semillasContainer");
-    const semillaHTML = `<div class="semilla">
-                            <div class="form-group row">
-                                <div class="col-sm-6 mb-3 mb-sm-0">
-                                    <input class="form-control form-control-user" placeholder="Id de Semilla" type="number" class="semillaId" required>
-                                </div>
-                                <div class="col-sm-6">
-                                    <input class="form-control form-control-user" placeholder="Cantidad" type="number" class="cantidad" required>
-                                </div>
-                                
-                    <br><br>
-                            </div>
-                            <a onclick="eliminarSemilla(this)" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm">
-                    <i class="fas fa-pen"></i> Eliminar
-                    </a>
-                    <br><br>
+
+    const semillaHTML = `
+        <div class="semilla">
+            <div class="form-group row">
+                <div class="col-sm-6 mb-3 mb-sm-0">
+                    <select class="form-control semillaSelect" required>
+                        <option value="" disabled selected>Selecciona una semilla</option>
+                    </select>
                 </div>
-            `;
+                <div class="col-sm-6">
+                    <input class="form-control form-control-user" placeholder="Cantidad" type="number" required>
+                </div>
+            </div>
+            <a onclick="eliminarSemilla(this)" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm">
+                <i class="fas fa-pen"></i> Eliminar
+            </a>
+            <br><br>
+        </div>
+    `;
+
+    // Insert the HTML
     semillasContainer.insertAdjacentHTML("beforeend", semillaHTML);
+
+    // Get the newly added select element and fill it with options
+    const newSelect = semillasContainer.querySelector(".semilla:last-child .semillaSelect");
+    llenarSelectSemillas(newSelect);
 }
 
 function eliminarSemilla(button) {
     button.parentNode.remove();
 }
+function llenarSelectSemillas(selectElement) {
+    const queryURL = "http://localhost:5005/api/Semilla";
+    const token = getCookie("jwtToken");
 
-function registrarPedido(event) {
-    event.preventDefault();
+    if (!token || !getRoleFromToken()) {
+        if (!sessionStorage.getItem("redirected")) {
+            sessionStorage.setItem("redirected", "true");
+            window.location.href = "/Home/Login";
+        }
+        return;
+    }
+
+    fetch(queryURL, {
+        headers: {
+            'Authorization': 'Bearer ' + token,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(response => response.json())
+        .then(data => {
+            selectElement.innerHTML = "<option value=''>Selecciona una semilla</option>";
+
+            data.forEach(semilla => {
+                const option = document.createElement("option");
+                option.value = semilla.id;
+                option.textContent = semilla.nombre;
+                selectElement.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.error("Error al cargar las semillas en el select:", error);
+        });
+}
+
+function registrarPedido() {
+    const queryURL = 'http://localhost:5005/api/pedido/crear';
+    const token = getCookie("jwtToken");
+    if (!token || !getRoleFromToken()) {
+        if (!sessionStorage.getItem("redirected")) {
+            sessionStorage.setItem("redirected", "true");
+            window.location.href = "/Home/Login";
+        }
+        return;
+    }
+
     const numeroPedido = document.getElementById("numeroPedido").value;
     const estadoId = parseInt(document.getElementById("estadoId").value);
     const notasEnvio = document.getElementById("notasEnvio").value;
-
     const detalles = [];
     const semillas = document.querySelectorAll(".semilla");
+
     semillas.forEach(semilla => {
-        const semillaId = parseInt(semilla.querySelector(".semillaId").value);
-        const cantidad = parseInt(semilla.querySelector(".cantidad").value);
-        detalles.push({ semillaId, cantidad });
+        const semillaIdInput = semilla.querySelector("#semillaId");
+        const cantidadInput = semilla.querySelector("#cantidad");
+
+        if (semillaIdInput && cantidadInput) {
+            const semillaSelect = document.getElementById("semillaSelect");
+            const semillaId = parseInt(semillaSelect.value);
+            const cantidad = parseInt(cantidadInput.value);
+            detalles.push({ semillaId, cantidad });
+        } else {
+            console.error("No se encontró un campo semillaId o cantidad en el elemento semilla.");
+        }
     });
 
     const pedido = {
@@ -592,21 +878,27 @@ function registrarPedido(event) {
         detalles
     };
 
-    fetch("http://localhost:5005/api/pedido/crear", {
+    fetch(queryURL, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
+            'Content-Type': 'application/json',
+            },
         body: JSON.stringify(pedido)
     })
         .then(response => {
             if (response.ok) {
                 alert("Pedido registrado exitosamente.");
-                window.location.href = "/Home/VistaPedidos";
+                window.location.href = "/Home/ListarPedidos";
             } else {
-                throw new Error("Error al registrar el pedido.");
+                return response.json().then(errorData => {
+                    console.error("Error en la respuesta del servidor:", errorData);
+                    alert("Error al registrar el pedido: " + (errorData.message || "Error desconocido en el servidor"));
+                });
             }
         })
-        .catch(error => alert("No se pudo registrar el pedido: " + error));
+        .catch(error => {
+            console.error("Error en la solicitud de fetch:", error);
+            alert("No se pudo registrar el pedido: " + error.message);
+        });
 }

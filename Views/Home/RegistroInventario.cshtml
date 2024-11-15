@@ -7,68 +7,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Usuario</title>
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+    <title>Registrar Semilla</title>
 </head>
 <body class="bg-gradient-primary">
-
     <div class="container">
-
         <div class="card o-hidden border-0 shadow-lg my-5">
             <div class="card-body p-0">
                 <div>
                     <div class="p-5">
-                        <!-- Nested Row within Card Body -->
-
                         <div class="text-center">
                             <h1 class="h4 text-gray-900 mb-4">Registrar Semilla</h1>
                         </div>
                         <form class="user" onsubmit="crearSemilla(); return false;">
+                            <!-- Campos para nombre, código, y descripción de la semilla -->
                             <div class="form-group row">
                                 <div class="col-sm-6 mb-3 mb-sm-0">
-                                    <input class="form-control form-control-user" placeholder="Nombre" type="text" id="nombre" name="nombre" required>
+                                    <input class="form-control form-control-user" placeholder="Nombre" type="text" id="nombre" required>
                                 </div>
                                 <div class="col-sm-6">
-                                    <input class="form-control form-control-user" placeholder="Codigo" type="text" id="codigo" name="codigo" required>
+                                    <input class="form-control form-control-user" placeholder="Código" type="text" id="codigo" required>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <textarea class="form-control form-control-user" placeholder="Descripcion" id="descripcion" name="descripcion" required></textarea>
+                                <textarea class="form-control form-control-user" placeholder="Descripción" id="descripcion" required></textarea>
                             </div>
                             <div class="form-group">
-                                <input class="form-control form-control-user" placeholder="Cantidad" type="number" id="cantidad" name="cantidad" required>
+                                <input class="form-control form-control-user" placeholder="Cantidad" type="number" id="cantidad" required>
                             </div>
 
-                            <div class="form-group row">
-                                <div class="col-sm-6 mb-3 mb-sm-0">
-                                    <input class="form-control form-control-user" placeholder="Categoria" input type="number" id="idCategoria" name="idCategoria" required max="2" min="1">
-                                </div>
-                                <div class="col-sm-6">
-                                    <input class="form-control form-control-user" placeholder="Ubicacion" type="text" id="ubicacion" name="ubicacion" required>
-                                </div>
+                            <!-- Select para Categoría -->
+                            <div class="form-group">
+                                <select class="form-control " id="idCategoria" required>
+                                    <option value="" disabled selected>Seleccione una categoría</option>
+                                    <option value="1">Frutal</option>
+                                    <option value="2">No Frutal</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <h5>Ubicación</h5>
+                                <select class="form-control" id="ubicacionLetra" required>
+                                    <option value="" disabled selected>Letra (A-Z)</option>
+                                </select>
+                   
+                                <br />
+                                <select class="form-control" id="ubicacionNumero1" required>
+                                    <option value="" disabled selected>01 o 02</option>
+                                    <option value="01">01</option>
+                                    <option value="02">02</option>
+                                </select>
+                                <br />
+                                <select class="form-control" id="ubicacionNumero2" required>
+                                    <option value="" disabled selected>Altura (10-70)</option>
+                                </select>
                             </div>
                             <hr>
                             <button class="btn btn-success btn-user btn-block" type="submit">
                                 Registrar
                             </button>
-
                         </form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    </div>
-
-    <!-- Bootstrap core JavaScript-->
-    <script src="~/Content/vendor/jquery/jquery.min.js"></script>
-    <script src="~/Content/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Core plugin JavaScript-->
-    <script src="~/Content/vendor/jquery-easing/jquery.easing.min.js"></script>
-
-    <!-- Custom scripts for all pages-->
-    <script src="~/Content/js/sb-admin-2.min.js"></script>
-
 </body>
 </html>
+

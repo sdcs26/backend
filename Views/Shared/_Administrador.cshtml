@@ -1,5 +1,4 @@
-﻿
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -9,6 +8,7 @@
     <link href="~/Content/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
           rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
     <link href="~/Content/css/sb-admin-2.css" rel="stylesheet">
 </head>
 <body id="page-top">
@@ -18,53 +18,56 @@
 
         <!-- Sidebar -->
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="@Url.Action("Login", "Cuenta")">
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-seedling"></i>
                 </div>
-                <div class="sidebar-brand-text mx-3"> Sowing O2</div>
+                <div class="sidebar-brand-text mx-3">Sowing O2</div>
             </a>
 
             <!-- Divider -->
             <hr class="sidebar-divider">
 
-            <!-- Nav Item - Charts -->
+            <!-- Nav Item - Opciones de Menú según Rol -->
+            <!-- Sidebar - Dynamic Menu based on Role -->
             <li class="nav-item">
+                <!-- Elements visible for both roles -->
                 <a class="nav-link" asp-area="" asp-controller="Home" asp-action="CrearUsuario">
                     <i class="far fa-edit"></i>
                     <span>Registrar Usuario</span>
                 </a>
-                <a onclick="listarUsuarios()" class="nav-link" asp-area="" asp-controller="Home" asp-action="ListarUsuarios">
+                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="ListarUsuarios">
                     <i class="far fa-edit"></i>
                     <span>Listar Usuarios</span>
                 </a>
-                <a onclick="listarUsuarios()" class="nav-link" asp-area="" asp-controller="Home" asp-action="RegistroInventario">
+
+                <!-- Elements for Administrator only (role 1) -->
+                <a class="nav-link admin-only" asp-area="" asp-controller="Home" asp-action="RegistroInventario">
                     <i class="far fa-edit"></i>
-                    <span>Registrar Semilla</span>
+                    <span>Registrar Inventario</span>
                 </a>
-                <a onclick="listarUsuarios()" class="nav-link" asp-area="" asp-controller="Home" asp-action="VistaInventario">
+                <a class="nav-link admin-only" asp-area="" asp-controller="Home" asp-action="VistaInventario">
                     <i class="far fa-edit"></i>
-                    <span>Vista Semilla</span>
+                    <span>Vista Inventario</span>
                 </a>
-                <a onclick="listarUsuarios()" class="nav-link" asp-area="" asp-controller="Home" asp-action="ListarPedidos">
+                <a class="nav-link admin-only" asp-area="" asp-controller="Home" asp-action="ListarPedidos">
                     <i class="far fa-edit"></i>
-                    <span>Listar de Pedidos</span>
+                    <span>Listar Pedidos</span>
                 </a>
-                <a onclick="listarUsuarios()" class="nav-link" asp-area="" asp-controller="Home" asp-action="RegistrarPedidos">
+                <a class="nav-link admin-only" asp-area="" asp-controller="Home" asp-action="RegistrarPedidos">
                     <i class="far fa-edit"></i>
                     <span>Registrar Pedidos</span>
                 </a>
             </li>
+
+
             <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">
-
             <!-- Sidebar Toggler (Sidebar) -->
             <div class="text-center d-none d-md-inline">
                 <button class="rounded-circle border-0" id="sidebarToggle"></button>
             </div>
-
         </ul>
         <!-- End of Sidebar -->
         <!-- Content Wrapper -->

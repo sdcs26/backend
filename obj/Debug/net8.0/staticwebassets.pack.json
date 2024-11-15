@@ -13,16 +13,12 @@
       "PackagePath": "staticwebassets\\Content\\css\\sb-admin-2.min.css"
     },
     {
-      "Id": "C:\\Users\\ivany\\OneDrive\\Escritorio\\Sowing_O2\\Sowing_O2\\wwwroot\\Content\\img\\BuscandoSemillas.png",
-      "PackagePath": "staticwebassets\\Content\\img\\BuscandoSemillas.png"
+      "Id": "C:\\Users\\ivany\\OneDrive\\Escritorio\\Sowing_O2\\Sowing_O2\\wwwroot\\Content\\img\\BuscandoSemillas1.png",
+      "PackagePath": "staticwebassets\\Content\\img\\BuscandoSemillas1.png"
     },
     {
-      "Id": "C:\\Users\\ivany\\OneDrive\\Escritorio\\Sowing_O2\\Sowing_O2\\wwwroot\\Content\\img\\IndexGerente.png",
-      "PackagePath": "staticwebassets\\Content\\img\\IndexGerente.png"
-    },
-    {
-      "Id": "C:\\Users\\ivany\\OneDrive\\Escritorio\\Sowing_O2\\Sowing_O2\\wwwroot\\Content\\img\\IndexOperario.png",
-      "PackagePath": "staticwebassets\\Content\\img\\IndexOperario.png"
+      "Id": "C:\\Users\\ivany\\OneDrive\\Escritorio\\Sowing_O2\\Sowing_O2\\wwwroot\\Content\\img\\IndexUsuario1.png",
+      "PackagePath": "staticwebassets\\Content\\img\\IndexUsuario1.png"
     },
     {
       "Id": "C:\\Users\\ivany\\OneDrive\\Escritorio\\Sowing_O2\\Sowing_O2\\wwwroot\\Content\\img\\Logo-removebg-preview.png",
@@ -43,14 +39,6 @@
     {
       "Id": "C:\\Users\\ivany\\OneDrive\\Escritorio\\Sowing_O2\\Sowing_O2\\wwwroot\\Content\\img\\imgRegister.png",
       "PackagePath": "staticwebassets\\Content\\img\\imgRegister.png"
-    },
-    {
-      "Id": "C:\\Users\\ivany\\OneDrive\\Escritorio\\Sowing_O2\\Sowing_O2\\wwwroot\\Content\\img\\indexAdmin.png",
-      "PackagePath": "staticwebassets\\Content\\img\\indexAdmin.png"
-    },
-    {
-      "Id": "C:\\Users\\ivany\\OneDrive\\Escritorio\\Sowing_O2\\Sowing_O2\\wwwroot\\Content\\img\\indexUser.png",
-      "PackagePath": "staticwebassets\\Content\\img\\indexUser.png"
     },
     {
       "Id": "C:\\Users\\ivany\\OneDrive\\Escritorio\\Sowing_O2\\Sowing_O2\\wwwroot\\Content\\img\\undraw_posting_photo.svg",

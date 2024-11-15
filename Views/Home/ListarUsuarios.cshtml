@@ -2,7 +2,7 @@
     ViewData["Title"] = "Listar Usuarios";
     Layout = "_Administrador";
 }
-
+<script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
 <p>
     <a class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm" asp-area="" asp-controller="Home" asp-action="LoginExitoso">Home</a>
 </p>
@@ -22,6 +22,7 @@
                             <th>Nombre</th>
                             <th>Apellido</th>
                             <th>Correo Electrónico</th>
+                            <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>

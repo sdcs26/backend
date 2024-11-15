@@ -12,6 +12,7 @@ namespace Front_Prueba.Controllers
         {
             _logger = logger;
         }
+        
         public IActionResult Login()
         {
             return View();

@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Editar Cantidad";
+    ViewData["Title"] = "Registrar Pedido";
     Layout = "_Administrador";
 }
 <!DOCTYPE html>
@@ -8,7 +8,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Actualizar Cantidad</title>
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+    <title>Agregar Pedido</title>
 </head>
 
 <body class="bg-gradient-primary">
@@ -24,16 +25,22 @@
                         <div class="text-center">
                             <h1 class="h4 text-gray-900 mb-4">Añadir Pedido</h1>
                         </div>
-                        <form class="user" onsubmit="cambiarEstadoPedido(); return false;">
+                        <form onsubmit="registrarPedido(); return false;">
 
                             <div class="form-group">
                                 <input class="form-control form-control-user" placeholder="Numero de Pedido" type="text" id="numeroPedido" required>
                             </div>
                             <div class="form-group">
-                                <input class="form-control form-control-user" placeholder="Id de Estado" type="number" id="estadoId" required>
+                                <select class="form-control" id="estadoId" required>
+                                    <option value="" disabled selected>Selecciona un estado</option>
+                                    <option value="3">Pendiente</option>
+                                    <option value="4">En Proceso</option>
+                                    <option value="5">Completado</option>
+                                    <option value="6">Enviado</option>
+                                </select>
                             </div>
                             <div class="form-group">
-                                <textarea class="form-control form-control-user" placeholder="Detalles del envio (Opcional)" id="notasEnvio"></textarea>
+                                <textarea class="form-control form-control-user" placeholder="Detalles del envio" id="notasEnvio" required></textarea>
                             </div>
                             <div id="semillasContainer">
                                 <h1 class="h4 text-gray-900 mb-4">Semillas del pedido</h1>
@@ -57,7 +64,7 @@
     </div>
 
     </div>
-
+    <script src="~/js/site.js"></script>
     <!-- Bootstrap core JavaScript-->
     <script src="~/Content/vendor/jquery/jquery.min.js"></script>
     <script src="~/Content/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>

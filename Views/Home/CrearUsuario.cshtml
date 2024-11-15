@@ -7,6 +7,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
     <title>Registro de Usuario</title>
 </head>
 <body class="bg-gradient-primary">
@@ -41,8 +42,15 @@
                                 <div class="col-sm-6 mb-3 mb-sm-0">
                                     <input class="form-control form-control-user" placeholder="Numero de Documento" type="number" id="numerodocumento" name="numerodocumento" required>
                                 </div>
-                                <div class="col-sm-6">
+                                @* <div class="col-sm-6">
                                     <input class="form-control form-control-user" placeholder="Rol" type="number" id="idrol" name="idrol" required>
+                                </div> *@
+                                <div class="form-group">
+                                    <select class="form-control" id="idrol" required>
+                                        <option value="" disabled selected>Selecciona el Rol</option>
+                                        <option value="1">Administrador</option>
+                                        <option value="2">Gerente</option>
+                                    </select>
                                 </div>
                             </div>
                             <hr>

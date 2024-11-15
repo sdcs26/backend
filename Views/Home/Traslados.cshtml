@@ -8,6 +8,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
     <title>Hacer Traslados</title>
 </head>
 
@@ -26,8 +27,22 @@
                         </div>
                         <form class="user" onsubmit="trasladarSemilla(); return false;">
 
+                          
                             <div class="form-group">
-                                <input class="form-control form-control-user" placeholder="Nueva Ubicacion" type="text" id="nuevaUbicacion" required>
+                                <h5>Ubicación</h5>
+                                <select class="form-control" id="ubicacionLetra" required>
+                                    <option value="" disabled selected>Letra (A-Z)</option>
+                                </select>
+                                <br />
+                                <select class="form-control" id="ubicacionNumero1" required>
+                                    <option value="" disabled selected>01 o 02</option>
+                                    <option value="01">01</option>
+                                    <option value="02">02</option>
+                                </select>
+                                <br />
+                                <select class="form-control" id="ubicacionNumero2" required>
+                                    <option value="" disabled selected>Altura (10-70)</option>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <input class="form-control form-control-user" placeholder="Id de Usuario" type="number" id="idUsuario" required>

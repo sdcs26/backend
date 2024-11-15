@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "eKavSHMdRJc8auxgRv+ZrM4UseEkK6XHHXv174CmIx8=",
+  "Hash": "JTlb0nt6gDyj5u+AjhYbttpIJZi098ssEDMMeXr8sK0=",
   "Source": "Front-Prueba",
   "BasePath": "_content/Front-Prueba",
   "Mode": "Default",
@@ -93,12 +93,12 @@
       "OriginalItemSpec": "wwwroot\\Content\\css\\sb-admin-2.min.css"
     },
     {
-      "Identity": "C:\\Users\\ivany\\OneDrive\\Escritorio\\Sowing_O2\\Sowing_O2\\wwwroot\\Content\\img\\BuscandoSemillas.png",
+      "Identity": "C:\\Users\\ivany\\OneDrive\\Escritorio\\Sowing_O2\\Sowing_O2\\wwwroot\\Content\\img\\BuscandoSemillas1.png",
       "SourceId": "Front-Prueba",
       "SourceType": "Discovered",
       "ContentRoot": "C:\\Users\\ivany\\OneDrive\\Escritorio\\Sowing_O2\\Sowing_O2\\wwwroot\\",
       "BasePath": "_content/Front-Prueba",
-      "RelativePath": "Content/img/BuscandoSemillas.png",
+      "RelativePath": "Content/img/BuscandoSemillas1.png",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -109,7 +109,7 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\Content\\img\\BuscandoSemillas.png"
+      "OriginalItemSpec": "wwwroot\\Content\\img\\BuscandoSemillas1.png"
     },
     {
       "Identity": "C:\\Users\\ivany\\OneDrive\\Escritorio\\Sowing_O2\\Sowing_O2\\wwwroot\\Content\\img\\imgLogin.png",
@@ -150,12 +150,12 @@
       "OriginalItemSpec": "wwwroot\\Content\\img\\imgRegister.png"
     },
     {
-      "Identity": "C:\\Users\\ivany\\OneDrive\\Escritorio\\Sowing_O2\\Sowing_O2\\wwwroot\\Content\\img\\indexAdmin.png",
+      "Identity": "C:\\Users\\ivany\\OneDrive\\Escritorio\\Sowing_O2\\Sowing_O2\\wwwroot\\Content\\img\\IndexUsuario1.png",
       "SourceId": "Front-Prueba",
       "SourceType": "Discovered",
       "ContentRoot": "C:\\Users\\ivany\\OneDrive\\Escritorio\\Sowing_O2\\Sowing_O2\\wwwroot\\",
       "BasePath": "_content/Front-Prueba",
-      "RelativePath": "Content/img/indexAdmin.png",
+      "RelativePath": "Content/img/IndexUsuario1.png",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -166,64 +166,7 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\Content\\img\\indexAdmin.png"
-    },
-    {
-      "Identity": "C:\\Users\\ivany\\OneDrive\\Escritorio\\Sowing_O2\\Sowing_O2\\wwwroot\\Content\\img\\IndexGerente.png",
-      "SourceId": "Front-Prueba",
-      "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\ivany\\OneDrive\\Escritorio\\Sowing_O2\\Sowing_O2\\wwwroot\\",
-      "BasePath": "_content/Front-Prueba",
-      "RelativePath": "Content/img/IndexGerente.png",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "PreferTarget",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\Content\\img\\IndexGerente.png"
-    },
-    {
-      "Identity": "C:\\Users\\ivany\\OneDrive\\Escritorio\\Sowing_O2\\Sowing_O2\\wwwroot\\Content\\img\\IndexOperario.png",
-      "SourceId": "Front-Prueba",
-      "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\ivany\\OneDrive\\Escritorio\\Sowing_O2\\Sowing_O2\\wwwroot\\",
-      "BasePath": "_content/Front-Prueba",
-      "RelativePath": "Content/img/IndexOperario.png",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "PreferTarget",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\Content\\img\\IndexOperario.png"
-    },
-    {
-      "Identity": "C:\\Users\\ivany\\OneDrive\\Escritorio\\Sowing_O2\\Sowing_O2\\wwwroot\\Content\\img\\indexUser.png",
-      "SourceId": "Front-Prueba",
-      "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\ivany\\OneDrive\\Escritorio\\Sowing_O2\\Sowing_O2\\wwwroot\\",
-      "BasePath": "_content/Front-Prueba",
-      "RelativePath": "Content/img/indexUser.png",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "PreferTarget",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\Content\\img\\indexUser.png"
+      "OriginalItemSpec": "wwwroot\\Content\\img\\IndexUsuario1.png"
     },
     {
       "Identity": "C:\\Users\\ivany\\OneDrive\\Escritorio\\Sowing_O2\\Sowing_O2\\wwwroot\\Content\\img\\Logo-removebg-preview.png",
